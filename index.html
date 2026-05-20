@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Чат с Пингвином</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <div class="room_sidebar">
+            <h2>Список комнат</h2>
+            <ul>
+                <a href="#" class="room-link" data-room="global"><li>🌍 Общий холл</li> </a>
+                <a href="#" class="room-link" data-room="python"><li>🐍 Python комната</li></a>
+                <a href="#" class="room-link" data-room="games"><li>🎮 Игровая</li></a>
+            </ul>
+        </div>
+        
+
+        <h1>Мой Пет-Мессенджер</h1>
+        <div id="typing-status" style="font-size: 12px; color: gray; height: 15px; width: 40px;"></div>
+        <div id="messages" style="border: 1px solid #ccc; height: 300px; overflow-y: scroll; margin-bottom: 10px; padding: 10px;">
+            <!-- Тут будут появляться сообщения -->
+        </div>
+
+        
+        <form action="" onsubmit="sendMessage(event)">
+            <input type="text" id="messageText" autocomplete="off" placeholder="Напиши что-нибудь..."/>
+            <input type="text" id="messageText2" autocomplete="off" placeholder="Напиши своё имя..."/>
+            <button>Отправить</button>
+        </form>
+
+        <script>
+            var room = "iceberg_1"; 
+            let ws = new WebSocket("ws://127.0.0.1:8000/ws/" + room)
+            
+            // Когда сервер присылает ответ — рисуем его в списке
+            ws.onmessage = function(event) {
+                var messages = document.getElementById('messages');
+                var jsonMessage = JSON.parse(event.data)
+                
+                function typeMessage(){
+                    if(jsonMessage.type == "typing"){
+                        var statusDiv = document.getElementById("typing-status")
+                        statusDiv.textContent = jsonMessage.username + " печатает... "
+    
+                        clearTimeout(window.typingTimer);
+                        window.typingTimer = setTimeout(function() {
+                            statusDiv.textContent = "";
+                        }, 3000);
+
+                        return true
+                    }
+                }
+
+                if(typeMessage() == true){
+                    return
+                }
+
+                function paintText(parent, color=undefined, text) {
+                    var greenMessage = document.createElement('p')
+                    greenMessage.style.color = color
+                    greenMessage.textContent = ` [${jsonMessage.time}]: ` + text 
+                    parent.appendChild(greenMessage)
+                }
+
+                if(jsonMessage.type == "system"){
+                    paintText(messages, jsonMessage.color, jsonMessage.content)
+                }
+                else if(jsonMessage.type == "system" && jsonMessage.content == "Penguin leave"){
+                    paintText(messages, jsonMessage.color, jsonMessage.content)
+                }
+                else {
+                    paintText(messages, jsonMessage.color, jsonMessage.username+": "+jsonMessage.text)
+                }
+
+                // Прокрутка вниз
+                messages.scrollTop = messages.scrollHeight;
+
+            };
+
+            function sendMessage(event) {
+                var input = document.getElementById("messageText");
+                var name = document.getElementById("messageText2");
+                
+                // Создаем объект (JSON)
+                var payload = {
+                    "username": name.value, // То имя, что мы спросили в prompt
+                    "text": input.value
+                };
+                
+                input.oninput = function() {
+                    ws.send(JSON.stringify({
+                        "type": "typing",
+                        "username": name.value,
+                    }))
+                }
+
+                // Превращаем в строку и отправляем
+                ws.send(JSON.stringify(payload)); 
+                
+                input.value = '';
+                event.preventDefault();
+            }
+
+            
+            function connectToRoom(roomName){
+                
+                if(ws){
+                    ws.close()
+                }
+                let wst = new WebSocket("ws://127.0.0.1:8000/ws/" + roomName)  
+
+                // wst.onmessage = function(event){
+                //     let data = JSON.parse(event.data)
+                // }
+
+            }
+
+            document.querySelectorAll('.room-link').forEach(links => {
+                links.onclick = function(e){
+                    e.preventDefault()
+
+                    let room = this.getAttribute('data-room')
+                    connectToRoom(room)
+
+                    document.querySelector('#messages').innerHTML = ''
+                }
+            })
+        </script>
+    </body>
+</html>
