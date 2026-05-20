@@ -81,4 +81,4 @@ async def Pinguin_chat(websocket: WebSocket, room_name: str):
         # await json_message("system", "", "", "red", "Penguin leave")
 
 
-        print("A someone get out")
+        print("A someone get out in the connection! ")
