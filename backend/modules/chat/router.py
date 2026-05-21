@@ -1,11 +1,11 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from backend.modules.chat.service import chat_service
 
-router = APIRouter(
+Chat_router = APIRouter(
     tags=["Chat"]
 )
 
-@router.websocket("/ws/{room_name}")
+@Chat_router.websocket("/ws/{room_name}")
 async def Pinguin_chat(websocket: WebSocket, room_name: str):
     # 1. Подключаем пингвина к комнате
     await chat_service.connect(websocket, room_name)
