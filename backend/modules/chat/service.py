@@ -8,30 +8,30 @@ class ChatService:
         # Раздельная история для каждой комнаты: {"room1": [{"text": "привет", ...}]}
         self.rooms_history = {}
 
-    async def connect(self, websocket: WebSocket, room_name: str):
+    async def connect(self, websocket: WebSocket, user_room: str):
         """Регистрирует пингвина в комнате и отправляет ему старую историю этой комнаты"""
         await websocket.accept()
         
         # Если комнаты еще нет, создаем её структуру
-        if room_name not in self.rooms:
-            self.rooms[room_name] = []
-            self.rooms_history[room_name] = []
+        if user_room not in self.rooms:
+            self.rooms[user_room] = []
+            self.rooms_history[user_room] = []
             
-        self.rooms[room_name].append(websocket)
-        print(f"A someone get in room: {room_name}")
+        self.rooms[user_room].append(websocket)
+        print(f"A someone get in room: {user_room}")
 
         # Отправляем новому пингвину историю именно ЭТОЙ комнаты
-        for old_msg in self.rooms_history[room_name]:
+        for old_msg in self.rooms_history[user_room]:
             await websocket.send_json(old_msg)
 
-    async def disconnect(self, websocket: WebSocket, room_name: str):
+    async def disconnect(self, websocket: WebSocket, user_room: str):
         """Удаляет пингвина из комнаты при отключении"""
-        if room_name in self.rooms:
-            if websocket in self.rooms[room_name]:
-                self.rooms[room_name].remove(websocket)
-        print(f"A someone get out from room: {room_name}")
+        if user_room in self.rooms:
+            if websocket in self.rooms[user_room]:
+                self.rooms[user_room].remove(websocket)
+        print(f"A someone get out from room: {user_room}")
 
-    async def broadcast_message(self, room_name: str, type_of: str, name: str, text: str, color: str, content: str):
+    async def broadcast_message(self, user_room: str, type_of: str, name: str, text: str, color: str, content: str):
         """Формирует JSON-сообщение, сохраняет в историю комнаты и рассылает всем внутри нее"""
         time_now = datetime.now().strftime("%H:%M")
 
@@ -45,25 +45,28 @@ class ChatService:
         }
 
         # Сохраняем в историю конкретной комнаты (держим лимит 20 сообщений)
-        self.rooms_history[room_name].append(json_array)
-        if len(self.rooms_history[room_name]) > 20:
-            self.rooms_history[room_name].pop(0)
+        self.rooms_history[user_room].append(json_array)
+        if len(self.rooms_history[user_room]) > 20:
+            self.rooms_history[user_room].pop(0)
 
         # Рассылаем сообщение ТОЛЬКО пингвинам из этой комнаты
-        if room_name in self.rooms:
-            for connection in self.rooms[room_name]:
+        if user_room in self.rooms:
+            for connection in self.rooms[user_room]:
                 await connection.send_json(json_array)
 
-    async def broadcast_typing(self, room_name: str, sender_websocket: WebSocket, username: str):
+    async def broadcast_typing(self, user_room: str, sender_websocket: WebSocket, username: str):
         """Рассылает статус печати всем в комнате, кроме самого печатающего"""
-        if room_name in self.rooms:
-            for connection in self.rooms[room_name]:
+        if user_room in self.rooms:
+            for connection in self.rooms[user_room]:
                 if connection != sender_websocket:
                     await connection.send_json({"type": "typing", "username": username})
 
-    async def create_room(self, room_name: str, sender_websocket: WebSocket, username: str):
+    async def create_room(self, user_room: str, username: str):
         """Создаём комнаты самих пользователей"""
-        
+        if user_room not in self.rooms:
+            if user_room in self.rooms:
+                for connection in self.rooms[user_room]:
+                    await connection.send_json({"user_room": username })
 
 # Создаем один экземпляр сервиса для всего приложения (Singleton)
 chat_service = ChatService()

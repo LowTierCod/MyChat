@@ -7,7 +7,7 @@
     <body>
         <div class="room_sidebar">
             <h2>Ваши контакты</h2>
-            <ul>
+            <ul class="contact_list">
                 <a href="#" class="room-link" data-room="global"><li>Вы пока здесь одни</li> </a>
             </ul>
         </div>
@@ -73,7 +73,19 @@
                 // Прокрутка вниз
                 messages.scrollTop = messages.scrollHeight;
 
+                function createUserRoom(){
+                    
+                    var userRoom = document.createElement('a')
+                    var userList = document.getElementsByClassName("user_list")
+
+                    userRooom.textContent = jsonMessage.user_room;
+
+                    userList.appendChild(userRoom)
+
+                }
             };
+
+             
 
             function sendMessage(event) {
                 var input = document.getElementById("messageText");
@@ -98,31 +110,30 @@
                 input.value = '';
                 event.preventDefault();
             }
-
             
-            function connectToRoom(roomName){
+            // function connectToRoom(roomName){
                 
-                if(ws){
-                    ws.close()
-                }
-                let wst = new WebSocket("ws://127.0.0.1:8000/ws/" + roomName)  
+            //     if(ws){
+            //         ws.close()
+            //     }
+            //     let wst = new WebSocket("ws://127.0.0.1:8000/ws/" + roomName)  
 
-                // wst.onmessage = function(event){
-                //     let data = JSON.parse(event.data)
-                // }
+            //     // wst.onmessage = function(event){
+            //     //     let data = JSON.parse(event.data)
+            //     // }
 
-            }
+            // }
 
-            document.querySelectorAll('.room-link').forEach(links => {
-                links.onclick = function(e){
-                    e.preventDefault()
+            // document.querySelectorAll('.room-link').forEach(links => {
+            //     links.onclick = function(e){
+            //         e.preventDefault()
 
-                    let room = this.getAttribute('data-room')
-                    connectToRoom(room)
+            //         let room = this.getAttribute('data-room')
+            //         connectToRoom(room)
 
-                    document.querySelector('#messages').innerHTML = ''
-                }
-            })
+            //         document.querySelector('#messages').innerHTML = ''
+            //     }
+            // })
 
         </script>
     </body>
