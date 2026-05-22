@@ -33,7 +33,8 @@
 
         <script>
             var room = "iceberg_1"; 
-            let ws = new WebSocket("ws://127.0.0.1:8000/ws/" + room)
+            wsConnect = "ws://127.0.0.1:8000/ws/"
+            let ws = new WebSocket(wsConnect + "chat/" + room)
             
             // Когда сервер присылает ответ — рисуем его в списке
             ws.onmessage = function(event) {
@@ -104,6 +105,15 @@
                 event.preventDefault();
             }
             
+            function addRooms(){
+                let roomName = document.getElementById("roomName").value
+                let roomCreator = new WebSocket(wsConnect + "room/" + roomName)
+
+                // roomCreator.send(JSON.stringify({
+                //     "user_room": roomName
+                // }))
+            }
+
             function createRoom(event) {
                 var userRoom = document.createElement('a')
                 var roomNumber = document.createElement('li')
@@ -118,8 +128,10 @@
                 userRoom.appendChild(roomNumber)
                 contactList.appendChild(userRoom)
 
+                addRooms()
 
                 event.preventDefault();
+
             }
 
             // function connectToRoom(roomName){

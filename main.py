@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 from backend.modules.chat.router import Chat_router as chat_router
+from backend.modules.chat.room import Room_router as room_router
 from backend.core.router import Core_router as core_router
 
 app = FastAPI(title="PyWebChat Монолит")
 
 app.include_router(chat_router)
+app.include_router(room_router)
 app.include_router(core_router)
 
 @app.get("/")

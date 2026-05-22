@@ -62,7 +62,6 @@ class ChatService:
                     await connection.send_json({"type": "typing", "username": username})
 
 class RoomService:
-
     def __init__(self):
         self.user_rooms = []
 
@@ -71,7 +70,9 @@ class RoomService:
 
     async def create_room(self, websocket: WebSocket, username: str):
         """Создаём комнаты самих пользователей"""
-        websocket.send_json({"user_room": username })
+        await self.user_rooms[username].send_json({"user_room": username })
+        
+        # print("connect is true, message:" + username)
 
 # Создаем один экземпляр сервиса для всего приложения (Singleton)
 chat_service = ChatService()

@@ -5,11 +5,11 @@ Chat_router = APIRouter(
     tags=["Chat"]
 )
 
-@Chat_router.websocket("/ws/{user_room}")
+@Chat_router.websocket("/ws/chat/{user_room}")
 async def Pinguin_chat(websocket: WebSocket, user_room: str):
     # 1. Подключаем пингвина к комнате
     await chat_service.connect(websocket, user_room)
-    
+    print("chat enviroment")
     try:
         # 2. Слушаем сообщения от клиента в бесконечном цикле
         while True:
@@ -30,8 +30,15 @@ async def Pinguin_chat(websocket: WebSocket, user_room: str):
         # 3. Если пингвин отвалился — чистим списки
         await chat_service.disconnect(websocket, user_room)
 
-# @Chat_router.websocket("/ws/{user_room}")
-# async def create_rooms(websocket: WebSocket, user_room: str, username: str):
-#     room_json = await websocket.receive_json()
-    
-#     await chat_service.create_room(user_room, username)
+
+
+# @Chat_router.websocket("/ws/chat")
+# async def Pinguin_chat(websocket: WebSocket): # Оставили ТОЛЬКО websocket
+#     await websocket.accept()
+#     try:
+#         while True:
+#             data = await websocket.receive_text()
+#             # временно просто печатаем в консоль сервера, что клиент что-то прислал
+#             print(f"Получили: {data}") 
+#     except Exception as e:
+#         print(f"Отключение или ошибка: {e}")
