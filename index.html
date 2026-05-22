@@ -26,6 +26,11 @@
             <button>Отправить</button>
         </form>
 
+        <form action="" onsubmit="createRoom(event)">
+            <input type="text" id="roomName" autocomplete="off" placeholder="Создадите комнату"/>
+            <button>Создать</button>
+        </form>
+
         <script>
             var room = "iceberg_1"; 
             let ws = new WebSocket("ws://127.0.0.1:8000/ws/" + room)
@@ -73,19 +78,7 @@
                 // Прокрутка вниз
                 messages.scrollTop = messages.scrollHeight;
 
-                function createUserRoom(){
-                    
-                    var userRoom = document.createElement('a')
-                    var userList = document.getElementsByClassName("user_list")
-
-                    userRooom.textContent = jsonMessage.user_room;
-
-                    userList.appendChild(userRoom)
-
-                }
             };
-
-             
 
             function sendMessage(event) {
                 var input = document.getElementById("messageText");
@@ -111,6 +104,24 @@
                 event.preventDefault();
             }
             
+            function createRoom(event) {
+                var userRoom = document.createElement('a')
+                var roomNumber = document.createElement('li')
+
+                var contactList = document.getElementsByClassName("contact_list")[0]
+                var roomName = document.getElementById("roomName")
+                userRoom.classList.add('room-link')
+                userRoom.setAttribute('href', '#')
+
+                roomNumber.textContent = roomName.value
+
+                userRoom.appendChild(roomNumber)
+                contactList.appendChild(userRoom)
+
+
+                event.preventDefault();
+            }
+
             // function connectToRoom(roomName){
                 
             //     if(ws){

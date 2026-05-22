@@ -23,8 +23,15 @@ async def Pinguin_chat(websocket: WebSocket, user_room: str):
                 await chat_service.broadcast_typing(user_room, websocket, username)
             else:
                 # Передаем сервису отправку обычного сообщения
-                await chat_service.broadcast_message(user_room, "user", username, text, "black", "") 
+                await chat_service.broadcast_message(user_room, "user", username, text+"fff", "black", "") 
+            
 
     except WebSocketDisconnect:
         # 3. Если пингвин отвалился — чистим списки
         await chat_service.disconnect(websocket, user_room)
+
+# @Chat_router.websocket("/ws/{user_room}")
+# async def create_rooms(websocket: WebSocket, user_room: str, username: str):
+#     room_json = await websocket.receive_json()
+    
+#     await chat_service.create_room(user_room, username)

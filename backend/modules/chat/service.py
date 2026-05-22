@@ -61,12 +61,19 @@ class ChatService:
                 if connection != sender_websocket:
                     await connection.send_json({"type": "typing", "username": username})
 
-    async def create_room(self, user_room: str, username: str):
+class RoomService:
+
+    def __init__(self):
+        self.user_rooms = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+
+    async def create_room(self, websocket: WebSocket, username: str):
         """Создаём комнаты самих пользователей"""
-        if user_room not in self.rooms:
-            if user_room in self.rooms:
-                for connection in self.rooms[user_room]:
-                    await connection.send_json({"user_room": username })
+        websocket.send_json({"user_room": username })
 
 # Создаем один экземпляр сервиса для всего приложения (Singleton)
 chat_service = ChatService()
+
+room_service = RoomService()
