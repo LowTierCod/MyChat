@@ -34,10 +34,11 @@
         <script>
             var room = "iceberg_1"; 
             wsConnect = "ws://127.0.0.1:8000/ws/"
-            let ws = new WebSocket(wsConnect + "chat/" + room)
+            let chatSocket = new WebSocket(wsConnect + "chat/" + room)
+            let roomSocket = new WebSocket(wsConnect + "room/" + room)
             
             // Когда сервер присылает ответ — рисуем его в списке
-            ws.onmessage = function(event) {
+            chatSocket.onmessage = function(event) {
                 var messages = document.getElementById('messages');
                 var jsonMessage = JSON.parse(event.data)
                 
@@ -92,35 +93,32 @@
                 };
                 
                 input.oninput = function() {
-                    ws.send(JSON.stringify({
+                    chatSocket.send(JSON.stringify({
                         "type": "typing",
                         "username": name.value,
                     }))
                 }
 
                 // Превращаем в строку и отправляем
-                ws.send(JSON.stringify(payload)); 
+                chatSocket.send(JSON.stringify(payload)); 
                 
                 input.value = '';
                 event.preventDefault();
             }
             
+            roomSocket.onmessage = function(event) {
+                let textMessage = JSON.parse(event.data)
+                console.log("onRoom txt")
+                console.log(textMessage)
+            }
             
-            function addRooms(){
+            function addRooms(newRoomName){
                 let roomName = document.getElementById("roomName").value
-                let roomCreator = new WebSocket(wsConnect + "room/" + roomName)
-
-                roomCreator.onRoom = function name(event) {
-                    
-                    let textMessage = JSON.parse(event.data)
-    
-                    console.log(textMessage)
-                }
-
-                
-                // roomCreator.send(JSON.stringify({
-                //     "user_room": roomName
-                // }))
+        
+                roomSocket.send(JSON.stringify({
+                    "userName": room,
+                    "new_user_room": [newRoomName]
+                }))
             }
 
             function createRoom(event) {
@@ -137,12 +135,12 @@
                 userRoom.appendChild(roomNumber)
                 contactList.appendChild(userRoom)
 
-                addRooms()
+                addRooms(roomName.value)
 
                 event.preventDefault();
 
             }
-            console.log()
+            
             // function connectToRoom(roomName){
                 
             //     if(ws){

@@ -63,20 +63,24 @@ class ChatService:
 
 class RoomService:
     def __init__(self):
-        self.user_rooms = []
+        self.user_rooms = {}
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
 
-    async def create_room(self, websocket: WebSocket, user_room: str):
-        """Создаём комнаты самих пользователей"""
-        for create_room in self.user_rooms[user_room]:
-            await create_room.send_json({"user_room": user_room})
-            print (user_room)
+    async def create_room(self, websocket: WebSocket, username: str, users_rooms: list):
+        """Создаём и добавляем комнаты самих пользователей"""
+        self.user_rooms["user"] = username
+        self.user_rooms["users_rooms"] = users_rooms
         
-        # print("connect is true, message:" + username)
+        pack_json = []
+        pack_json.append(self.user_rooms)
+
+        await websocket.send_json(pack_json)
+
+        print(f"connect is true, message: {self.user_rooms}")
 
 # Создаем один экземпляр сервиса для всего приложения (Singleton)
 chat_service = ChatService()
-
+# Создаем экземпляр для сервиса по созданию комнта
 room_service = RoomService()

@@ -23,7 +23,7 @@ async def Pinguin_chat(websocket: WebSocket, user_room: str):
                 await chat_service.broadcast_typing(user_room, websocket, username)
             else:
                 # Передаем сервису отправку обычного сообщения
-                await chat_service.broadcast_message(user_room, "user", username, text+"fff", "black", "") 
+                await chat_service.broadcast_message(user_room, "user", username, text, "black", "") 
             
 
     except WebSocketDisconnect:
