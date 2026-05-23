@@ -105,10 +105,19 @@
                 event.preventDefault();
             }
             
+            
             function addRooms(){
                 let roomName = document.getElementById("roomName").value
                 let roomCreator = new WebSocket(wsConnect + "room/" + roomName)
 
+                roomCreator.onRoom = function name(event) {
+                    
+                    let textMessage = JSON.parse(event.data)
+    
+                    console.log(textMessage)
+                }
+
+                
                 // roomCreator.send(JSON.stringify({
                 //     "user_room": roomName
                 // }))
@@ -133,7 +142,7 @@
                 event.preventDefault();
 
             }
-
+            console.log()
             // function connectToRoom(roomName){
                 
             //     if(ws){

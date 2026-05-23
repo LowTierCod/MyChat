@@ -68,9 +68,11 @@ class RoomService:
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
 
-    async def create_room(self, websocket: WebSocket, username: str):
+    async def create_room(self, websocket: WebSocket, user_room: str):
         """Создаём комнаты самих пользователей"""
-        await self.user_rooms[username].send_json({"user_room": username })
+        for create_room in self.user_rooms[user_room]:
+            await create_room.send_json({"user_room": user_room})
+            print (user_room)
         
         # print("connect is true, message:" + username)
 
