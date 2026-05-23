@@ -52,6 +52,7 @@ class ChatService:
         # Рассылаем сообщение ТОЛЬКО пингвинам из этой комнаты
         if user_room in self.rooms:
             for connection in self.rooms[user_room]:
+                print(f"send message {self.rooms[user_room]}")
                 await connection.send_json(json_array)
 
     async def broadcast_typing(self, user_room: str, sender_websocket: WebSocket, username: str):
@@ -65,6 +66,8 @@ class RoomService:
     def __init__(self):
         self.user_rooms = {}
 
+        self.connection = {}
+
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
 
@@ -73,13 +76,20 @@ class RoomService:
         self.user_rooms["user"] = username
         self.user_rooms["users_rooms"] = users_rooms
         
+        self.connection[username] = []
+        self.connection[username].append(websocket)
+        
         pack_json = []
         pack_json.append(self.user_rooms)
 
-        await websocket.send_json(pack_json)
+        print(self.connection)
 
-        print(f"connect is true, message: {self.user_rooms}")
-
+        try:    
+            for socket in self.connection[username]:
+                await socket.send_json(pack_json)
+        except:
+            print("something is not good")
+            print(self.user_rooms)
 # Создаем один экземпляр сервиса для всего приложения (Singleton)
 chat_service = ChatService()
 # Создаем экземпляр для сервиса по созданию комнта

@@ -9,7 +9,6 @@ Chat_router = APIRouter(
 async def Pinguin_chat(websocket: WebSocket, user_room: str):
     # 1. Подключаем пингвина к комнате
     await chat_service.connect(websocket, user_room)
-    print("chat enviroment")
     try:
         # 2. Слушаем сообщения от клиента в бесконечном цикле
         while True:
@@ -24,6 +23,7 @@ async def Pinguin_chat(websocket: WebSocket, user_room: str):
             else:
                 # Передаем сервису отправку обычного сообщения
                 await chat_service.broadcast_message(user_room, "user", username, text, "black", "") 
+                print("send message")
             
 
     except WebSocketDisconnect:
