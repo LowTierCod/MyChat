@@ -76,7 +76,7 @@
                 else {
                     paintText(messages, jsonMessage.color, jsonMessage.username+": "+jsonMessage.text)
                 }
-
+                
                 // Прокрутка вниз
                 messages.scrollTop = messages.scrollHeight;
 
@@ -108,16 +108,16 @@
             
             roomSocket.onmessage = function(event) {
                 let textMessage = JSON.parse(event.data)
-                console.log("onRoom txt")
-                console.log(textMessage)
+                
+                console.log(event.data)
             }
             
             function addRooms(newRoomName){
                 let roomName = document.getElementById("roomName").value
         
                 roomSocket.send(JSON.stringify({
-                    "userName": room,
-                    "new_user_room": [newRoomName]
+                    "username": room,
+                    "new_user_room": newRoomName
                 }))
             }
 
