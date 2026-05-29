@@ -6,7 +6,7 @@ class ChatService:
         # Храним комнаты и их активные websocket-сессии: {"room1": [ws1, ws2]}
         self.rooms = {}
         # Раздельная история для каждой комнаты: {"room1": [{"text": "привет", ...}]}
-        self.rooms_history = {}
+        self.chat_history = {}
 
     async def connect(self, websocket: WebSocket, user_room: str):
         """Регистрирует пингвина в комнате и отправляет ему старую историю этой комнаты"""
@@ -15,13 +15,13 @@ class ChatService:
         # Если комнаты еще нет, создаем её структуру
         if user_room not in self.rooms:
             self.rooms[user_room] = []
-            self.rooms_history[user_room] = []
+            self.chat_history[user_room] = []
             
         self.rooms[user_room].append(websocket)
         print(f"A someone get in room: {user_room}")
 
         # Отправляем новому пингвину историю именно ЭТОЙ комнаты
-        for old_msg in self.rooms_history[user_room]:
+        for old_msg in self.chat_history[user_room]:
             await websocket.send_json(old_msg)
 
     async def disconnect(self, websocket: WebSocket, user_room: str):
@@ -45,9 +45,9 @@ class ChatService:
         }
 
         # Сохраняем в историю конкретной комнаты (держим лимит 20 сообщений)
-        self.rooms_history[user_room].append(json_array)
-        if len(self.rooms_history[user_room]) > 20:
-            self.rooms_history[user_room].pop(0)
+        self.chat_history[user_room].append(json_array)
+        if len(self.chat_history[user_room]) > 20:
+            self.chat_history[user_room].pop(0)
 
         # Рассылаем сообщение ТОЛЬКО пингвинам из этой комнаты
         if user_room in self.rooms:
@@ -68,16 +68,21 @@ class RoomService:
 
         self.connection = {}
 
-    async def connect(self, websocket: WebSocket):
+        self.contact_list = {}
+
+    async def connect(self, websocket: WebSocket, users_rooms: str):
         await websocket.accept()
+
+        self.connection.setdefault(users_rooms, []).append(websocket)
+
+        await websocket.send_json(self.contact_list)
 
     async def create_room(self, websocket: WebSocket, username: str, users_rooms: str):
         """Создаём и добавляем комнаты самих пользователей"""
         self.user_rooms["user"] = username
         self.user_rooms["users_rooms"] = users_rooms
         
-        self.connection[username] = []
-        self.connection[username].append(websocket)
+        self.contact_list.setdefault("contact", []).append(users_rooms)
 
         try:    
             for socket in self.connection[username]:
@@ -85,6 +90,13 @@ class RoomService:
         except:
             print("something is wrong")
             print(self.user_rooms)
+
+    async def send_rooms(self, username: str):
+        for send_lists in self.connection[username]:
+            await send_lists.send_json(self.contact_list)
+
+            print(self.contact_list)
+
 # Создаем один экземпляр сервиса для всего приложения (Singleton)
 chat_service = ChatService()
 # Создаем экземпляр для сервиса по созданию комнта

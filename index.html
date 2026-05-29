@@ -26,7 +26,7 @@
             <button>Отправить</button>
         </form>
 
-        <form action="" onsubmit="createRoom(event)">
+        <form action="" onsubmit="addRooms(roomName.value)">
             <input type="text" id="roomName" autocomplete="off" placeholder="Создадите комнату"/>
             <button>Создать</button>
         </form>
@@ -36,7 +36,8 @@
             wsConnect = "ws://127.0.0.1:8000/ws/"
             let chatSocket = new WebSocket(wsConnect + "chat/" + room)
             let roomSocket = new WebSocket(wsConnect + "room/" + room)
-            
+
+
             // Когда сервер присылает ответ — рисуем его в списке
             chatSocket.onmessage = function(event) {
                 var messages = document.getElementById('messages');
@@ -106,64 +107,62 @@
                 event.preventDefault();
             }
             
-            roomSocket.onmessage = function(event) {
-                let textMessage = JSON.parse(event.data)
+            function addRooms(newRoomName="popka", currentUser=room){
                 
-                console.log(event.data)
-            }
-            
-            function addRooms(newRoomName){
-                let roomName = document.getElementById("roomName").value
-        
-                roomSocket.send(JSON.stringify({
-                    "username": room,
+                addRoomArray = {
+                    "username": currentUser,
                     "new_user_room": newRoomName
-                }))
+                }
+
+                roomSocket.send(JSON.stringify(addRoomArray))
+
+                return newRoomName
             }
 
-            function createRoom(event) {
-                var userRoom = document.createElement('a')
-                var roomNumber = document.createElement('li')
-
-                var contactList = document.getElementsByClassName("contact_list")[0]
-                var roomName = document.getElementById("roomName")
-                userRoom.classList.add('room-link')
-                userRoom.setAttribute('href', '#')
-
-                roomNumber.textContent = roomName.value
-
-                userRoom.appendChild(roomNumber)
-                contactList.appendChild(userRoom)
-
-                addRooms(roomName.value)
-
-                event.preventDefault();
-
-            }
-            
-            // function connectToRoom(roomName){
+            // 1. Изменяем функцию: теперь она принимает конкретное ИМЯ комнаты
+            function createRoom(name) {
+                var userRoom = document.createElement('a');
+                var roomNumber = document.createElement('li');
                 
-            //     if(ws){
-            //         ws.close()
-            //     }
-            //     let wst = new WebSocket("ws://127.0.0.1:8000/ws/" + roomName)  
+                var contactList = document.getElementsByClassName("contact_list")[0];
+                
+                userRoom.classList.add('room-link');
+                userRoom.setAttribute('href', '#');
+                
+                // Сразу задаем имя комнате, полученное из аргумента
+                roomNumber.textContent = name; 
 
-            //     // wst.onmessage = function(event){
-            //     //     let data = JSON.parse(event.data)
-            //     // }
+                userRoom.appendChild(roomNumber);
+                contactList.appendChild(userRoom);
 
-            // }
+                // Возвращаем созданный элемент, если он понадобится в будущем
+                return roomNumber;
+            }
 
-            // document.querySelectorAll('.room-link').forEach(links => {
-            //     links.onclick = function(e){
-            //         e.preventDefault()
+            let roomList = []
 
-            //         let room = this.getAttribute('data-room')
-            //         connectToRoom(room)
+            // 2. Обработчик сообщений от сервера
+            roomSocket.onmessage = function(event) {
+                let textMessage = JSON.parse(event.data);
+                
+                // Предполагаем, что сервер присылает либо массив комнат, либо одну комнату.
+                // Если textMessage.contact — это массив комнат:
+                let roomList = textMessage.contact; 
+                
+                // Если сервер присылает строку (одну комнату), раскомментируйте строчку ниже, чтобы обернуть её в массив:
+                // let roomList = Array.isArray(textMessage.contact) ? textMessage.contact : [textMessage.contact];
+                if (roomList && roomList.length > 0) {
+                    roomList.forEach((roomName) => {
+                        // Передаем ИМЯ комнаты (строку) внутрь функции создания
+                        createRoom(roomName); 
+                    });
+                }
+                
+                console.log(textMessage.contact);
+            };
 
-            //         document.querySelector('#messages').innerHTML = ''
-            //     }
-            // })
+
+            
 
         </script>
     </body>
