@@ -26,17 +26,20 @@
             <button>Отправить</button>
         </form>
 
-        <form action="" onsubmit="addRooms(roomName.value)">
+        <form action="" onsubmit="addRooms(roomName.value); ">
             <input type="text" id="roomName" autocomplete="off" placeholder="Создадите комнату"/>
             <button>Создать</button>
         </form>
 
         <script>
             var room = "iceberg_1"; 
-            wsConnect = "ws://127.0.0.1:8000/ws/"
+            let wsConnect = "ws://127.0.0.1:8000/ws/"
+            
             let chatSocket = new WebSocket(wsConnect + "chat/" + room)
             let roomSocket = new WebSocket(wsConnect + "room/" + room)
 
+            let input = document.getElementById("messageText");
+            let name = document.getElementById("messageText2");
 
             // Когда сервер присылает ответ — рисуем его в списке
             chatSocket.onmessage = function(event) {
@@ -84,21 +87,12 @@
             };
 
             function sendMessage(event) {
-                var input = document.getElementById("messageText");
-                var name = document.getElementById("messageText2");
-                
                 // Создаем объект (JSON)
                 var payload = {
                     "username": name.value, // То имя, что мы спросили в prompt
                     "text": input.value
                 };
                 
-                input.oninput = function() {
-                    chatSocket.send(JSON.stringify({
-                        "type": "typing",
-                        "username": name.value,
-                    }))
-                }
 
                 // Превращаем в строку и отправляем
                 chatSocket.send(JSON.stringify(payload)); 
@@ -106,19 +100,14 @@
                 input.value = '';
                 event.preventDefault();
             }
-            
-            function addRooms(newRoomName="popka", currentUser=room){
-                
-                addRoomArray = {
-                    "username": currentUser,
-                    "new_user_room": newRoomName
+
+            input.oninput = function() {
+                    chatSocket.send(JSON.stringify({
+                        "type": "typing",
+                        "username": name.value,
+                    }))
                 }
-
-                roomSocket.send(JSON.stringify(addRoomArray))
-
-                return newRoomName
-            }
-
+            
             // 1. Изменяем функцию: теперь она принимает конкретное ИМЯ комнаты
             function createRoom(name) {
                 var userRoom = document.createElement('a');
@@ -136,7 +125,21 @@
                 contactList.appendChild(userRoom);
 
                 // Возвращаем созданный элемент, если он понадобится в будущем
+                
                 return roomNumber;
+            }
+
+            function addRooms(newRoomName, currentUser=room){
+                
+                addRoomArray = {
+                    "username": currentUser,
+                    "new_user_room": newRoomName
+                }
+
+                createRoom(newRoomName)
+                console.log(newRoomName)
+                roomSocket.send(JSON.stringify(addRoomArray))
+                return newRoomName
             }
 
             let roomList = []

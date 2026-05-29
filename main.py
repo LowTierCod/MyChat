@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
-from backend.modules.chat.router import Chat_router as chat_router
+from backend.modules.chat.chat import Chat_router as chat_router
 from backend.modules.chat.room import Room_router as room_router
 from backend.core.router import Core_router as core_router
 
