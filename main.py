@@ -13,3 +13,10 @@ app.include_router(core_router)
 @app.get("/")
 async def get_main_page():
     return FileResponse("index.html")
+
+    # В main.py (или в твой core_router)
+
+@app.get("/room")
+async def get_room_page():
+    # Возвращаем наш новый HTML-файл комнаты
+    return FileResponse("room_page.html")

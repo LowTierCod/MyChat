@@ -114,9 +114,10 @@
                 var roomNumber = document.createElement('li');
                 
                 var contactList = document.getElementsByClassName("contact_list")[0];
-                
+                var link = "/room?name=" + name
+
                 userRoom.classList.add('room-link');
-                userRoom.setAttribute('href', '#');
+                userRoom.setAttribute('href', link);
                 
                 // Сразу задаем имя комнате, полученное из аргумента
                 roomNumber.textContent = name; 

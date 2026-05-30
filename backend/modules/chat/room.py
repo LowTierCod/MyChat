@@ -1,6 +1,7 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from backend.modules.chat.service import room_service
 
+
 Room_router = APIRouter( tags=['Room'])
 
 @Room_router.websocket("/ws/room/{user_room}")

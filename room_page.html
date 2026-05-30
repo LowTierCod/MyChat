@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Комната чата</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e24;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #2a2a35;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #4edf7a;
+            margin-bottom: 10px;
+        }
+        span {
+            color: #ffdd57;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Вы зашли в комнату: <span id="room-title">Загрузка...</span></h1>
+        <p>Добро пожаловать! Название выше вытащено прямо из ссылки.</p>
+        <a href="/" style="color: #aaa; text-decoration: none;">← Назад к списку</a>
+    </div>
+
+    <script>
+        // ЛОГИКА КЛИЕНТА:
+        // 1. Берем параметры из адресной строки браузера.
+        // Если ссылка выглядит как: /room.html?name=Влад
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomName = urlParams.get('name'); // Вытаскиваем то, что идет после "name="
+
+        // 2. Находим наш тег <span> на странице
+        const titleElement = document.getElementById('room-title');
+
+        // 3. Если имя нашли в ссылке — пишем его, если нет — пишем "Неизвестная комната"
+        if (roomName) {
+            titleElement.textContent = roomName;
+        } else {
+            titleElement.textContent = "Неизвестная комната";
+        }
+    </script>
+</body>
+</html>
