@@ -8,6 +8,8 @@ class ChatService:
         # Раздельная история для каждой комнаты: {"room1": [{"text": "привет", ...}]}
         self.chat_history = {}
 
+        self.room_connections = {}
+
     async def connect(self, websocket: WebSocket, user_room: str):
         """Регистрирует пингвина в комнате и отправляет ему старую историю этой комнаты"""
         await websocket.accept()
@@ -19,6 +21,8 @@ class ChatService:
             
         self.rooms[user_room].append(websocket)
         print(f"A someone get in room: {user_room}")
+
+        print(self.room_connections)
 
         # Отправляем новому пингвину историю именно ЭТОЙ комнаты
         for old_msg in self.chat_history[user_room]:
@@ -62,6 +66,9 @@ class ChatService:
                 if connection != sender_websocket:
                     await connection.send_json({"type": "typing", "username": username})
 
+# Создаем один экземпляр сервиса для всего приложения (Singleton)
+chat_service = ChatService()
+
 class RoomService:
     def __init__(self):
         self.user_rooms = {}
@@ -84,6 +91,8 @@ class RoomService:
         
         self.contact_list.setdefault("contact", []).append(users_rooms)
 
+        chat_service.room_connections.setdefault("new_room", []).append(users_rooms)
+
         try:    
             for socket in self.connection[username]:
                 await socket.send_json(self.user_rooms)
@@ -97,7 +106,5 @@ class RoomService:
 
             print(self.contact_list)
 
-# Создаем один экземпляр сервиса для всего приложения (Singleton)
-chat_service = ChatService()
 # Создаем экземпляр для сервиса по созданию комнта
 room_service = RoomService()
