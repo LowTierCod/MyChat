@@ -23,7 +23,6 @@ async def Pinguin_chat(websocket: WebSocket, user_room: str):
             else:
                 # Передаем сервису отправку обычного сообщения
                 await chat_service.broadcast_message(user_room, "user", username, text, "black", "") 
-                print("send message")
             
 
     except WebSocketDisconnect:

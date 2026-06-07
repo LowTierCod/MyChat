@@ -26,17 +26,17 @@
             <button>Отправить</button>
         </form>
 
-        <form action="" onsubmit="addRooms(roomName.value); ">
+        <form action="" onsubmit="addRooms(roomName.value); event.preventDefault()">
             <input type="text" id="roomName" autocomplete="off" placeholder="Создадите комнату"/>
             <button>Создать</button>
         </form>
 
         <script>
-            var room = "iceberg_1"; 
+            var currentUser = "iceberg_1"; 
             let wsConnect = "ws://127.0.0.1:8000/ws/"
             
-            let chatSocket = new WebSocket(wsConnect + "chat/" + room)
-            let roomSocket = new WebSocket(wsConnect + "room/" + room)
+            let chatSocket = new WebSocket(wsConnect + "chat/" + currentUser)
+            let roomSocket = new WebSocket(wsConnect + "room/" + currentUser)
 
             let input = document.getElementById("messageText");
             let name = document.getElementById("messageText2");
@@ -130,10 +130,10 @@
                 return roomNumber;
             }
 
-            function addRooms(newRoomName, currentUser=room){
+            function addRooms(newRoomName, username=currentUser){
                 
                 addRoomArray = {
-                    "username": currentUser,
+                    "username": username,
                     "new_user_room": newRoomName
                 }
 
