@@ -20,10 +20,10 @@ class ChatService:
             self.chat_history[room_name] = []
             
         self.rooms[room_name].append(websocket)
-        print(f"A someone get in room: {room_name}")
+        # print(f"A someone get in room: {room_name}")
 
-        print(f"Checking chat history {self.chat_history}")
-        print(f"Checking of room connection {self.room_connections}")
+        # print(f"Checking chat history {self.chat_history}")
+        # print(f"Checking of room connection {self.room_connections}")
 
         # Отправляем новому пингвину историю именно ЭТОЙ комнаты
         for old_msg in self.chat_history[room_name]:
@@ -34,7 +34,7 @@ class ChatService:
         if room_name in self.rooms:
             if websocket in self.rooms[room_name]:
                 self.rooms[room_name].remove(websocket)
-        print(f"A someone get out from room: {room_name}")
+        # print(f"A someone get out from room: {room_name}")
 
     async def broadcast_message(
             self, room_name: str, type_of: str, 
