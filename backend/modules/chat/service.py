@@ -35,7 +35,10 @@ class ChatService:
                 self.rooms[room_name].remove(websocket)
         print(f"A someone get out from room: {room_name}")
 
-    async def broadcast_message(self, room_name: str, type_of: str, name: str, text: str, color: str, content: str):
+    async def broadcast_message(
+            self, room_name: str, type_of: str, 
+            name: str, text: str, color: str, content: str
+        ):
         """Формирует JSON-сообщение, сохраняет в историю комнаты и рассылает всем внутри нее"""
         time_now = datetime.now().strftime("%H:%M")
 
@@ -74,12 +77,13 @@ chat_service = ChatService()
 
 class RoomService:
     def __init__(self):
+        """Храним комнаты пользователей"""
         self.user_rooms = {}
-
+        """Храним подключение нынешних сокетов"""
         self.connection = {}
-
+        """Здесь мы должны брать список всех знакомых этого пользователя"""
         self.contact_list = {}
-
+        """Здесь мы получаем от сервиса ChatService, сообщение"""
         self.get_msg = {}
 
     async def connect(self, websocket: WebSocket, room_name: str):
@@ -94,10 +98,17 @@ class RoomService:
         self.user_rooms["user"] = username
         self.user_rooms["users_rooms"] = room_name
         
+        """Добавить в новый список новые элементы"""
         self.contact_list.setdefault("contact", []).append(room_name)
 
+        """Тут уже мы оброщаемя к другому сервису(ChatService), 
+        и заполняем их список в своими данными в своей области сервиса"""
         chat_service.room_connections.setdefault("new_room", []).append(room_name)
 
+        """Здесь мы проверяем сможем ли мы отправить данные которые отправляет файлы 
+            про бизнес логику(в данном случае, у нас тут в этом сервисе это room.py).
+            А также у нас здесь отправляется данные клиенту
+            """
         try:    
             for socket in self.connection[username]:
                 await socket.send_json(self.user_rooms)
@@ -106,6 +117,7 @@ class RoomService:
             print(self.user_rooms)
 
     async def send_rooms(self, username: str):
+        """Здесь мы отправляем наши данные про комнаты к клиенту"""
         for send_lists in self.connection[username]:
             await send_lists.send_json(self.contact_list)
 
@@ -124,7 +136,7 @@ class RoomService:
             print(f"[БЭКЕНД] Юзер покинул комнату {room_name}")
 
     def room_get_chat_json(self, room_name: str):
-
+        """Здесь мы получаем данные комнат, которые мы имеем"""
         print(f"получены сообщение из {room_name}: {self.get_msg}")
 
 # Создаем экземпляр для сервиса по созданию комнта
