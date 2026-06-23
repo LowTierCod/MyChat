@@ -22,7 +22,8 @@ class ChatService:
         self.rooms[room_name].append(websocket)
         print(f"A someone get in room: {room_name}")
 
-        print(self.chat_history)
+        print(f"Checking chat history {self.chat_history}")
+        print(f"Checking of room connection {self.room_connections}")
 
         # Отправляем новому пингвину историю именно ЭТОЙ комнаты
         for old_msg in self.chat_history[room_name]:
@@ -104,6 +105,7 @@ class RoomService:
         """Тут уже мы оброщаемя к другому сервису(ChatService), 
         и заполняем их список в своими данными в своей области сервиса"""
         chat_service.room_connections.setdefault("new_room", []).append(room_name)
+        print(chat_service.room_connections)
 
         """Здесь мы проверяем сможем ли мы отправить данные которые отправляет файлы 
             про бизнес логику(в данном случае, у нас тут в этом сервисе это room.py).
