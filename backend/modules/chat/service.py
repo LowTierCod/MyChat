@@ -7,7 +7,7 @@ class ChatService:
         self.rooms = {}
         # Раздельная история для каждой комнаты: {"room1": [{"text": "привет", ...}]}
         self.chat_history = {}
-
+        # Здесь мы храним подключенные к комнаты, нам важно что бы бизнес логика чата знала к какой комнате мы обращаемся
         self.room_connections = {}
 
     async def connect(self, websocket: WebSocket, room_name: str):
@@ -91,7 +91,7 @@ class RoomService:
         await websocket.accept()
 
         self.connection.setdefault(room_name, []).append(websocket)
-        print(f"Имя комнаты: {room_name}")
+        print(f"Имя комнаты: {room_name} | Подключено сокетов: {len(self.connection[room_name])}")
         await websocket.send_json(self.contact_list)
 
     async def create_room(self, websocket: WebSocket, username: str, room_name: str):

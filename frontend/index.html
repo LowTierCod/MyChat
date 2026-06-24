@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Чат с Пингвином</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <div class="room_sidebar">
+            <h2>Ваши контакты</h2>
+            <ul class="contact_list">
+                <a href="#" class="room-link" data-room="global"><li>Вы пока здесь одни</li> </a>
+            </ul>
+        </div>
+        
+
+        <h1>Мой Пет-Мессенджер</h1>
+        <div id="typing-status" style="font-size: 12px; color: gray; height: 15px; width: 40px;"></div>
+        <div id="messages" style="border: 1px solid #ccc; height: 300px; overflow-y: scroll; margin-bottom: 10px; padding: 10px;">
+            <!-- Тут будут появляться сообщения -->
+        </div>
+
+        
+        <form action="" onsubmit="sendMessage(event)">
+            <input type="text" id="messageText" autocomplete="off" placeholder="Напиши что-нибудь..."/>
+            <input type="text" id="messageText2" autocomplete="off" placeholder="Напиши своё имя..."/>
+            <button>Отправить</button>
+        </form>
+
+        <form action="" onsubmit="addRooms(roomName.value); event.preventDefault()">
+            <input type="text" id="roomName" autocomplete="off" placeholder="Создадите комнату"/>
+            <button>Создать</button>
+        </form>
+
+        <script src="static/js/httpClient.js"></script>
+    </body>
+</html>

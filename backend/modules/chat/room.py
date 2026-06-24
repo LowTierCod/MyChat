@@ -21,7 +21,7 @@ async def creating_rooms(websocket: WebSocket, user_room: str):
             
             await room_service.connect_user_to_room(user_room, websocket)
             
-            room_service.disconnect_user_from_room(user_room, websocket)
+            # room_service.disconnect_user_from_room(user_room, websocket)
 
             room_service.room_get_chat_json(user_room)
             # await room_service.send_rooms(get_user_name)
